@@ -12,6 +12,8 @@ class Configuration;
 
 class WebPage
 {
+    friend bool operator==(const WebPage &lhs, const WebPage &rhs);
+    friend bool operator<(const WebPage &lhs, const WebPage &rhs);
 public:
     WebPage(std::string &doc, Configuration &conf, SplitTool *splitTool);
     ~WebPage() {}

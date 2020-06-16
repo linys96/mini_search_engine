@@ -1,4 +1,4 @@
-INC_DIR:= ../include
+INC_DIR:= ../include 
 SRC_DIR:= ./
 SRCS:=$(wildcard *.cc)
 OBJS:= $(patsubst %.cc, %.o, $(SRCS))
