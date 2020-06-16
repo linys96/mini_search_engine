@@ -1,5 +1,5 @@
-/* #define _LOG4CPP_ */
-/* #include "../include/MyLog.hpp" */
+#define _LOG4CPP_
+#include "../include/MyLog.hpp"
 #include "../include/WordQueryServer.hpp"
 #include "../include/Configuration.hpp"
 /* #include "../include/TimerThread.hpp" */
@@ -31,43 +31,29 @@ WordQueryServer::~WordQueryServer()
 }
 void WordQueryServer::onConnection(const TcpConnectionPtr &conn)
 {
-    printf("%s has connectd!\n",conn->toString().c_str());
-    /* LogInfo("%s has connectd!\n",conn->toString().c_str()); */
+    /* printf("%s has connectd!\n",conn->toString().c_str()); */
+    LogInfo("%s has connectd!\n",conn->toString().c_str());
     /* conn->send("welcome to server."); */
 }
 
 void WordQueryServer::onMessage(const TcpConnectionPtr &conn)
 {
-    /* int32_t len = conn->recvInt32(); */
-    
-    /* printf("len=%d\n",len); */
-    /* char buff[1024]={0}; */
-    /* conn->receiveN(buff,len); */
-    //json解码
-    /* Json::Value root; */
-    /* Json::Reader reader; */
-
-    /* if(!reader.parse(buff,root)){ */
-    /*     /1* printf("Json parse fail!\n"); *1/ */
-    /*     LogError("Json parse fail!\n"); */
-    /*     return; */
-    /* } */
-    
-    /* printf("buf=%s\n",buff); */
-    /* int i=0; */
-    /* string msg = root["queryWord"][i].asString(); */
     /* printf("msg=%s\n",msg.c_str()); */
-    string msg = conn -> receive();
-    size_t pos = msg.find('\n');
-    msg = msg.substr(0, pos);
-    /* LogInfo("client send: %s, size: %lu", msg.c_str(), msg.size()); */
-    _threadpool.addTask(std::bind(&WordQueryServer::doTaskThread, this, conn, msg));
+    /* string msg = conn -> receive(); */
+    /* size_t pos = msg.find('\n'); */
+    /* msg = msg.substr(0, pos); */
+    int len = conn->recvInt32();
+    char buff[1024] = {0};
+    conn->receiveN(buff, len);
+    buff[len - 1] = '\0'; //去掉换行
+    LogInfo("client send: %s, size: %d", buff, len);
+    _threadpool.addTask(std::bind(&WordQueryServer::doTaskThread, this, conn, buff));
 }
 
 void WordQueryServer::onClose(const TcpConnectionPtr &conn)
 {
-    printf("%s has closed!\n",conn->toString().c_str());
-    /* LogInfo("%s has closed!\n",conn->toString().c_str()); */
+    /* printf("%s has closed!\n",conn->toString().c_str()); */
+    LogInfo("%s has closed!\n",conn->toString().c_str());
 }
 
 void WordQueryServer::start()
@@ -90,11 +76,12 @@ void WordQueryServer::start()
 }
 void WordQueryServer::doTaskThread(const TcpConnectionPtr &conn, const std::string &msg)
 {
+
     string ret = _wordQuery.doQuery(msg);
     int sz = ret.size();
-    string message(std::to_string(sz));
-    message.append("\n").append(ret);
-    conn->sendInLoop(message);
+    cout << "sz = " << sz << endl;
+    conn->sendInt32(sz);
+    conn->sendInLoop(ret);
 }
 
 }//end of namespace lys

@@ -3,8 +3,6 @@
 
 #include "Thread.hpp"
 #include "TaskQueue.hpp"
-#include "TimerThread.hpp"
-#include "CacheManger.hpp"
 
 #include <vector>
 #include <memory>

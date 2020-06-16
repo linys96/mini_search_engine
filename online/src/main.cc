@@ -1,3 +1,4 @@
+#define _LOG4CPP_
 #include "../include/WordQueryServer.hpp"
 #include "../include/Configuration.hpp"
 

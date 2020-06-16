@@ -1,5 +1,7 @@
 #include "../include/WordQuery.hpp"
 #include "../include/Configuration.hpp"
+#include "../include/Thread.hpp"
+/* #include "../include/CacheManger.hpp" */
 #include <math.h>
 #include <json/json.h>
 #include <iostream>
@@ -63,14 +65,24 @@ WordQuery::WordQuery(Configuration &conf)
 
 std::string WordQuery::doQuery(const std::string &str)
 {
+
+    //先从cache中找
+    /* CacheManger *cachemanger = CacheManger::getInstance(); */
+    /* Cache &cache = cachemanger->getCache(atoi(lys::current_thread::threadName)); */
+    /* string result = cache.get(str); */
+    /* if(result != string()) { */
+    /*     return result; */
+    /* } */
+    //没找到再从词典中找
 	//对输入字符串进行分词
+    /* string result; */
 	vector<string> queryWords;
 	if(str.size() > 0) {
 		queryWords = _jieba(str);
 	}
 
 	for(auto item : queryWords) {
-		cout << item << '\n';
+		cout << item << endl;
 		auto uit = _invertIndexTable.find(item);
 		if(uit == _invertIndexTable.end()) {
 			cout << "can not found " << item << endl;
@@ -94,10 +106,14 @@ std::string WordQuery::doQuery(const std::string &str)
 		}
 
 		//将查询结果封装成Json数据
-		return createJson(docIdVec, queryWords);
+        /* result = createJson(docIdVec, queryWords); */
+        return  createJson(docIdVec, queryWords);
+        /* cache.set(str, result); */
 	} else {
-		return returnNoAnswer();
+        return returnNoAnswer();
+        /* result = returnNoAnswer(); */
 	}
+    /* return result; */
 }
 
 void WordQuery::loadLibrary()
