@@ -39,15 +39,15 @@ void WordQueryServer::onConnection(const TcpConnectionPtr &conn)
 void WordQueryServer::onMessage(const TcpConnectionPtr &conn)
 {
     /* printf("msg=%s\n",msg.c_str()); */
-    /* string msg = conn -> receive(); */
-    /* size_t pos = msg.find('\n'); */
-    /* msg = msg.substr(0, pos); */
-    int len = conn->recvInt32();
-    char buff[1024] = {0};
-    conn->receiveN(buff, len);
-    buff[len - 1] = '\0'; //去掉换行
-    LogInfo("client send: %s, size: %d", buff, len);
-    _threadpool.addTask(std::bind(&WordQueryServer::doTaskThread, this, conn, buff));
+    string msg = conn -> receive();
+    size_t pos = msg.find('\n');
+    msg = msg.substr(0, pos);
+    /* int len = conn->recvInt32(); */
+    /* char buff[1024] = {0}; */
+    /* conn->receiveN(buff, len); */
+    /* buff[len - 1] = '\0'; //去掉换行 */
+    LogInfo("client send: %s, size: %lu", msg, msg.size());
+    _threadpool.addTask(std::bind(&WordQueryServer::doTaskThread, this, conn, msg));
 }
 
 void WordQueryServer::onClose(const TcpConnectionPtr &conn)
@@ -80,8 +80,11 @@ void WordQueryServer::doTaskThread(const TcpConnectionPtr &conn, const std::stri
     string ret = _wordQuery.doQuery(msg);
     int sz = ret.size();
     cout << "sz = " << sz << endl;
-    conn->sendInt32(sz);
-    conn->sendInLoop(ret);
+    /* conn->sendInt32(sz); */
+    /* conn->sendInLoop(ret); */
+	string message(std::to_string(sz));
+	message.append("\n").append(ret);
+	conn->sendInLoop(message);
 }
 
 }//end of namespace lys
